@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffee Brewing Guide</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+  <div class="container" id="app">
+    <div class="lang-switcher">
+      <button class="btn-lang" @click="toggleLanguage" :title="translations[currentLang].switchLanguage">
+        {{ currentLang === 'ru' ? 'EN' : 'RU' }}
+      </button>
+    </div>
+
+    <div class="card">
+      <h1>{{ translations[currentLang].title }}</h1>
+
+      <div class="user-section">
+        <div class="user-greeting" v-if="nameConfirmed">
+          {{ translations[currentLang].greeting }}, <strong>{{ userName }}</strong>!
+          <button @click="startEditing" class="edit-btn">
+            <i class="fas fa-edit"></i> {{ translations[currentLang].edit }}
+          </button>
+        </div>
+
+        <div v-else>
+          <p>{{ translations[currentLang].namePrompt }}</p>
+          <div class="name-input" :class="{error: nameError}">
+            <div class="input-group">
+              <input 
+                v-model="tempUserName" 
+                :placeholder="translations[currentLang].namePlaceholder"
+                @keyup.enter="confirmName"
+                ref="nameInput"
+              >
+              <div class="error-message">
+                {{ translations[currentLang].nameError }}
+              </div>
+            </div>
+            <button 
+              class="btn btn-primary" 
+              @click="confirmName"
+              :disabled="!tempUserName.trim()"
+            >
+              <i class="fas fa-check"></i> {{ translations[currentLang].save }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress" :style="{width: progressWidth + '%'}"></div>
+        </div>
+      </div>
+
+      <div class="step-container">
+        <transition name="step" mode="out-in">
+          <div v-if="!isFinished" key="steps">
+            <div class="step-content">
+              <h2>{{ currentStep.title }}</h2>
+              <p>{{ currentStep.text }}</p>
+
+              <div class="timer-container" v-if="activeIndex === 4">
+                <div class="timer">
+                  <i class="fas fa-clock"></i> {{ translations[currentLang].timeRemaining }}: {{ formatTime(brewTime) }}
+                </div>
+                <div class="timer-controls">
+                  <button @click="toggleTimer" :title="translations[currentLang].toggleTimer">
+                    <i :class="timer ? 'fas fa-pause' : 'fas fa-play'"></i>
+                  </button>
+                  <button @click="resetTimer" :title="translations[currentLang].resetTimer">
+                    <i class="fas fa-redo"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <ul class="steps-list">
+              <li 
+                v-for="(step, index) in translations[currentLang].steps" 
+                :key="index"
+                :class="{
+                  'steps-item': true,
+                  'active': activeIndex === index,
+                  'done': activeIndex > index
+                }"
+                @click="setActive(index)"
+              >
+                <span>{{ index + 1 }}</span>
+                {{ step.title }}
+              </li>
+            </ul>
+          </div>
+
+          <div v-else key="finished" class="finished-container">
+            <h2>{{ translations[currentLang].finishedTitle }}</h2>
+            <p>{{ translations[currentLang].finishedText }}</p>
+            
+            <div class="rating-container">
+              <p>{{ translations[currentLang].rateQuestion }}</p>
+              <div>
+                <span 
+                  v-for="i in 5" 
+                  class="rating-star" 
+                  :class="{active: i <= rating}"
+                  @click="setRating(i)"
+                  :title="i + ' ' + translations[currentLang].stars"
+                >
+                  ★
+                </span>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
+
+      <div class="steps-nav">
+        <template v-if="!isFinished">
+          <button 
+            class="btn btn-outline" 
+            @click="prev" 
+            :disabled="isFirstStep"
+          >
+            <i class="fas fa-arrow-left"></i> {{ translations[currentLang].buttons.back }}
+          </button>
+          <button 
+            class="btn btn-primary" 
+            @click="nextOrFinish"
+          >
+            {{ isLastStep ? translations[currentLang].buttons.finish : translations[currentLang].buttons.next }} <i class="fas fa-arrow-right"></i>
+          </button>
+        </template>
+        
+        <button 
+          v-else
+          class="btn btn-primary" 
+          @click="restart"
+        >
+          <i class="fas fa-redo"></i> {{ translations[currentLang].buttons.restart }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="vue.js"></script>
+</body>
+</html>
