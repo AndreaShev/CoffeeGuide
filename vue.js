@@ -112,7 +112,7 @@ const App = {
     return {
       activeIndex: 0,
       isFinished: false,
-      currentLang: 'en',
+      currentLang: 'ru', // Русский язык по умолчанию
       translations: TRANSLATIONS,
       timer: null,
       brewTime: 240,
@@ -198,7 +198,6 @@ const App = {
     },
 
     startBrewTimer() {
-      // Таймер запускается на 5-м шаге (индекс 4)
       if (this.activeIndex === 4 && !this.isFinished && !this.timer) {
         this.timer = setInterval(() => {
           if (this.brewTime > 0) {
@@ -222,7 +221,6 @@ const App = {
     resetTimer() {
       clearInterval(this.timer);
       this.timer = null;
-      // Сброс таймера для 5-го шага (индекс 4)
       if (this.activeIndex === 4) {
         this.brewTime = 240;
       }
@@ -250,7 +248,6 @@ const App = {
   watch: {
     activeIndex(newIndex) {
       this.resetTimer();
-      // Таймер запускается при переходе на 5-й шаг (индекс 4)
       if (newIndex === 4) {
         this.startBrewTimer();
       }
@@ -265,13 +262,11 @@ const App = {
   },
 
   mounted() {
-    // Восстановление языка
     const savedLang = localStorage.getItem('coffeeLang');
     if (savedLang) {
       this.currentLang = savedLang;
     }
 
-    // Восстановление состояния
     const savedState = localStorage.getItem('coffeeAppState');
     if (savedState) {
       try {
@@ -286,7 +281,6 @@ const App = {
       }
     }
 
-    // Фокус на поле ввода при первом открытии
     if (!this.nameConfirmed) {
       this.$nextTick(() => {
         this.$refs.nameInput?.focus();
@@ -295,7 +289,6 @@ const App = {
   }
 };
 
-// Автосохранение состояния
 const app = Vue.createApp(App).mount('#app');
 
 setInterval(() => {
