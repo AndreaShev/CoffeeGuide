@@ -1,4 +1,5 @@
 :root {
+  /* CSS-переменные для цветовой схемы */
   --primary: #6F4E37;
   --secondary: #C4A484;
   --accent: #42b983;
@@ -8,12 +9,14 @@
 }
 
 * {
+  /* Сброс стилей для всех элементов */
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
+  /* Основные стили страницы */
   font-family: 'Roboto', sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -25,6 +28,7 @@ body {
 }
 
 .container {
+  /* Основной контейнер */
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
@@ -33,7 +37,7 @@ body {
 .card {
   background: white;
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   margin-bottom: 20px;
   position: relative;
@@ -250,8 +254,15 @@ h2 {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-section {
@@ -320,11 +331,11 @@ input:focus {
   .card {
     padding: 1.5rem;
   }
-  
+
   .steps-nav {
     flex-direction: column;
   }
-  
+
   .name-input {
     flex-direction: column;
   }

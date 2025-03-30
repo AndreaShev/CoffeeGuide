@@ -1,5 +1,7 @@
+// Объект с переводами для интерфейса
 const TRANSLATIONS = {
   en: {
+    /* Переводы на английский */
     title: "Coffee Brewing Guide",
     greeting: "Hello",
     namePrompt: "Please introduce yourself",
@@ -53,6 +55,7 @@ const TRANSLATIONS = {
     ]
   },
   ru: {
+    /* Переводы на русский */
     title: "Гид по приготовлению кофе",
     greeting: "Привет",
     namePrompt: "Представьтесь, пожалуйста",
@@ -109,66 +112,79 @@ const TRANSLATIONS = {
 
 const App = {
   data() {
+     // Реактивные данные
     return {
-      activeIndex: 0,
-      isFinished: false,
+      activeIndex: 0, // Индекс текущего шага
+      isFinished: false, // Флаг завершения
       currentLang: 'ru', // Русский язык по умолчанию
-      translations: TRANSLATIONS,
-      timer: null,
-      brewTime: 240,
-      rating: 0,
-      tempUserName: '',
-      userName: localStorage.getItem('coffeeUserName') || '',
-      nameConfirmed: !!localStorage.getItem('coffeeUserName'),
-      nameError: false
+      translations: TRANSLATIONS, // Объект переводов
+      timer: null, // Ссылка на таймер
+      brewTime: 240, // Время заваривания (4 минуты)
+      rating: 0, // Текущий рейтинг
+      tempUserName: '', // Временное имя пользователя
+      userName: localStorage.getItem('coffeeUserName') || '', // Имя из хранилища
+      nameConfirmed: !!localStorage.getItem('coffeeUserName'), // Подтверждение имени
+      nameError: false // Ошибка ввода имени
     };
   },
 
   computed: {
+       // Вычисляемые свойства
     currentStep() {
+         // Текущий шаг с переводом
       return this.translations[this.currentLang].steps[this.activeIndex];
     },
 
     isFirstStep() {
+       // Проверка первого шага
       return this.activeIndex === 0;
     },
 
     isLastStep() {
+          // Проверка последнего шага
       return this.activeIndex === this.translations[this.currentLang].steps.length - 1;
     },
 
     progressWidth() {
+        // Ширина прогресс-бара в %
       return ((this.activeIndex + 1) / this.translations[this.currentLang].steps.length) * 100;
     }
   },
 
   methods: {
+     // Методы приложения
     toggleLanguage() {
+      // Переключение языка
       this.currentLang = this.currentLang === 'ru' ? 'en' : 'ru';
       localStorage.setItem('coffeeLang', this.currentLang);
+      // Сохранение в хранилище
     },
 
     startEditing() {
+       // Начало редактирования имени
       this.tempUserName = this.userName;
       this.nameConfirmed = false;
       this.$nextTick(() => {
-        this.$refs.nameInput?.focus();
+        this.$refs.nameInput?.focus(); // Фокус на поле ввода
       });
     },
 
     confirmName() {
+      // Подтверждение имени
       if (this.tempUserName.trim().length >= 2) {
         this.userName = this.tempUserName.trim();
         this.nameConfirmed = true;
         this.nameError = false;
         localStorage.setItem('coffeeUserName', this.userName);
+        // Сохранение имени
       } else {
-        this.nameError = true;
-        this.$refs.nameInput?.focus();
+        this.nameError = true; // Ошибка, если имя слишком короткое
+        this.$refs.nameInput?.focus(); // Возврат фокуса
       }
     },
 
     prev() {
+        // Переход к предыдущему шагу
       if (this.activeIndex > 0) {
         this.resetTimer();
         this.activeIndex--;
@@ -176,6 +192,7 @@ const App = {
     },
 
     async nextOrFinish() {
+         // Переход к следующему шагу или завершение
       if (!this.isLastStep) {
         await this.$nextTick();
         this.activeIndex++;
@@ -186,11 +203,13 @@ const App = {
     },
 
     finishProcess() {
+        // Завершение процесса
       this.isFinished = true;
       this.resetTimer();
     },
 
     restart() {
+      // Перезапуск процесса
       this.activeIndex = 0;
       this.isFinished = false;
       this.brewTime = 240;
@@ -198,6 +217,7 @@ const App = {
     },
 
     startBrewTimer() {
+       // Запуск таймера заваривания
       if (this.activeIndex === 4 && !this.isFinished && !this.timer) {
         this.timer = setInterval(() => {
           if (this.brewTime > 0) {
@@ -210,6 +230,7 @@ const App = {
     },
 
     toggleTimer() {
+            // Пауза/продолжение таймера
       if (this.timer) {
         clearInterval(this.timer);
         this.timer = null;
@@ -219,25 +240,29 @@ const App = {
     },
 
     resetTimer() {
+          // Сброс таймера
       clearInterval(this.timer);
       this.timer = null;
       if (this.activeIndex === 4) {
-        this.brewTime = 240;
+        this.brewTime = 240; // Сброс времени
       }
     },
 
     formatTime(seconds) {
+       // Форматирование времени
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
       return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     },
 
     setRating(stars) {
+       // Установка рейтинга
       this.rating = stars;
       console.log(`User rating: ${stars} stars`);
     },
 
     setActive(index) {
+      // Переход к конкретному шагу
       if (!this.isFinished && index >= 0 && index < this.translations[this.currentLang].steps.length) {
         this.resetTimer();
         this.activeIndex = index;
@@ -246,30 +271,38 @@ const App = {
   },
 
   watch: {
+     // Наблюдатели за изменениями
     activeIndex(newIndex) {
+         // При изменении активного шага
       this.resetTimer();
       if (newIndex === 4) {
         this.startBrewTimer();
+        // Автозапуск таймера на 4 шаге
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Прокрутка вверх
     },
 
     tempUserName(newVal) {
+          // При изменении временного имени
       if (newVal.trim().length >= 2) {
-        this.nameError = false;
+        this.nameError = false; // Сброс ошибки
       }
     }
   },
 
   mounted() {
+    // Хук монтирования компонента
     const savedLang = localStorage.getItem('coffeeLang');
     if (savedLang) {
       this.currentLang = savedLang;
+      // Восстановление языка
     }
 
     const savedState = localStorage.getItem('coffeeAppState');
     if (savedState) {
       try {
+            // Восстановление состояния
         const state = JSON.parse(savedState);
         this.activeIndex = state.activeIndex || 0;
         this.isFinished = state.isFinished || false;
@@ -284,13 +317,14 @@ const App = {
     if (!this.nameConfirmed) {
       this.$nextTick(() => {
         this.$refs.nameInput?.focus();
+        // Автофокус на поле ввода
       });
     }
   }
 };
-
+// Создание и монтирование приложения Vue
 const app = Vue.createApp(App).mount('#app');
-
+// Автосохранение состояния каждые 3 секунды
 setInterval(() => {
   const state = {
     activeIndex: app.activeIndex,

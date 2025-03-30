@@ -1,117 +1,163 @@
 <!DOCTYPE html>
+<!-- Объявление типа документа HTML5 -->
 <html lang="ru">
+<!-- Корневой элемент с указанием языка (русский) -->
+
 <head>
+  <!-- Секция метаданных и заголовка страницы -->
   <meta charset="UTF-8">
+  <!-- Указание кодировки UTF-8 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Настройки viewport для адаптивного дизайна -->
   <title>Coffee Brewing Guide</title>
+  <!-- Заголовок страницы в браузере -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Подключение Font Awesome для иконок -->
   <link rel="stylesheet" href="theme.css">
+  <!-- Подключение файла стилей -->
 </head>
+
 <body>
+  <!-- Тело документа -->
   <div class="container" id="app">
+    <!-- Основной контейнер приложения с id для Vue -->
     <div class="card">
+      <!-- Карточка - основной визуальный контейнер -->
       <div class="lang-switcher">
+        <!-- Контейнер переключателя языка -->
         <button class="btn-lang" @click="toggleLanguage" :title="translations[currentLang].switchLanguage">
           {{ currentLang === 'ru' ? 'EN' : 'RU' }}
         </button>
+        <!-- Кнопка переключения языка с обработчиком click -->
+        <!-- Условное отображение текста кнопки -->
       </div>
 
       <h1>{{ translations[currentLang].title }}</h1>
-
+      <!-- Динамический заголовок с переводом -->
       <div class="user-section">
+        <!-- Секция пользователя -->
         <div class="user-greeting" v-if="nameConfirmed">
+          <!-- Приветствие, если имя подтверждено -->
           {{ translations[currentLang].greeting }}, <strong>{{ userName }}</strong>!
+          <!-- Текст приветствия с именем -->
           <button @click="startEditing" class="edit-btn">
+            <!-- Кнопка редактирования -->
             <i class="fas fa-edit"></i> {{ translations[currentLang].edit }}
+            <!-- Иконка и текст кнопки -->
           </button>
         </div>
 
         <div v-else>
+          <!-- Блок ввода имени, если не подтверждено -->
           <p>{{ translations[currentLang].namePrompt }}</p>
+          <!-- Подсказка для ввода имени -->
           <div class="name-input" :class="{error: nameError}">
+            <!-- Поле ввода с обработкой ошибок -->
             <div class="input-group">
-              <input 
-                v-model="tempUserName" 
-                :placeholder="translations[currentLang].namePlaceholder"
-                @keyup.enter="confirmName"
-                ref="nameInput"
-              >
+              <!-- Группа элементов ввода -->
+              <input v-model="tempUserName" :placeholder="translations[currentLang].namePlaceholder"
+                @keyup.enter="confirmName" ref="nameInput">
+              <!-- Двустороннее связывание с переменной -->
+              <!-- Динамический плейсхолдер -->
+              <!-- Обработка нажатия Enter -->
+              <!-- Ссылка для управления фокусом -->
               <div class="error-message">
+                <!-- Блок сообщения об ошибке -->
                 {{ translations[currentLang].nameError }}
               </div>
+              <!-- Текст ошибки -->
             </div>
-            <button 
-              class="btn btn-primary" 
-              @click="confirmName"
-              :disabled="!tempUserName.trim()"
-            >
+            <button class="btn btn-primary" @click="confirmName" :disabled="!tempUserName.trim()">
+              <!-- Обработчик подтверждения имени -->
+              <!-- Отключение кнопки при пустом поле -->
               <i class="fas fa-check"></i> {{ translations[currentLang].save }}
+              <!-- Иконка и текст кнопки -->
             </button>
           </div>
         </div>
       </div>
 
       <div class="progress-container">
+        <!-- Контейнер индикатора прогресса -->
         <div class="progress-bar">
+          <!-- Полоса прогресса -->
           <div class="progress" :style="{width: progressWidth + '%'}"></div>
+          <!-- Заполненная часть с динамической шириной -->
         </div>
       </div>
 
       <div class="step-container">
+        <!-- Контейнер шагов -->
         <transition name="step" mode="out-in">
+          <!-- Анимация перехода между шагами -->
           <div v-if="!isFinished" key="steps">
+            <!-- Блок шагов (если не завершено) -->
             <div class="step-content">
+              <!-- Контент текущего шага -->
               <h2>{{ currentStep.title }}</h2>
+              <!-- Заголовок шага -->
               <p>{{ currentStep.text }}</p>
-
+              <!-- Текст шага -->
               <div class="timer-container" v-if="activeIndex === 4">
+                <!-- Таймер (только для шага 4) -->
                 <div class="timer">
                   <i class="fas fa-clock"></i> {{ translations[currentLang].timeRemaining }}: {{ formatTime(brewTime) }}
                 </div>
+                <!-- Отображение времени -->
                 <div class="timer-controls">
+                  <!-- Управление таймером -->
                   <button @click="toggleTimer" :title="translations[currentLang].toggleTimer">
+                    <!-- Кнопка паузы/продолжения -->
                     <i :class="timer ? 'fas fa-pause' : 'fas fa-play'"></i>
+                    <!-- Динамическая иконка -->
                   </button>
                   <button @click="resetTimer" :title="translations[currentLang].resetTimer">
+                    <!-- Кнопка сброса -->
                     <i class="fas fa-redo"></i>
+                    <!-- Иконка -->
                   </button>
                 </div>
               </div>
             </div>
 
             <ul class="steps-list">
-              <li 
-                v-for="(step, index) in translations[currentLang].steps" 
-                :key="index"
-                :class="{
+              <!-- Список шагов -->
+              <li v-for="(step, index) in translations[currentLang].steps" :key="index" :class="{
                   'steps-item': true,
                   'active': activeIndex === index,
                   'done': activeIndex > index
-                }"
-                @click="setActive(index)"
-              >
+                }" @click="setActive(index)">
+                <!-- Цикл по шагам -->
+                <!-- Активный шаг -->
+                <!-- Завершенные шаги -->
+                <!-- Обработчик клика -->
                 <span>{{ index + 1 }}</span>
+                <!-- Номер шага -->
                 {{ step.title }}
+                <!-- Название шага -->
               </li>
             </ul>
           </div>
 
           <div v-else key="finished" class="finished-container">
+            <!-- Блок завершения -->
             <h2>{{ translations[currentLang].finishedTitle }}</h2>
+            <!-- Заголовок -->
             <p>{{ translations[currentLang].finishedText }}</p>
-            
+            <!-- Текст -->
             <div class="rating-container">
+              <!-- Блок рейтинга -->
               <p>{{ translations[currentLang].rateQuestion }}</p>
+              <!-- Вопрос -->
               <div>
-                <span 
-                  v-for="i in 5" 
-                  class="rating-star" 
-                  :class="{active: i <= rating}"
-                  @click="setRating(i)"
-                  :title="i + ' ' + translations[currentLang].stars"
-                >
+                <span v-for="i in 5" class="rating-star" :class="{active: i <= rating}" @click="setRating(i)"
+                  :title="i + ' ' + translations[currentLang].stars">
                   ★
                 </span>
+                <!-- Подсветка выбранных звезд -->
+                <!-- Обработчик клика -->
+                <!-- Подсказка -->
+                <!-- Символ звезды -->
               </div>
             </div>
           </div>
@@ -119,34 +165,42 @@
       </div>
 
       <div class="steps-nav">
+        <!-- Навигация -->
         <template v-if="!isFinished">
-          <button 
-            class="btn btn-outline" 
-            @click="prev" 
-            :disabled="isFirstStep"
-          >
+          <!-- Кнопки навигации -->
+          <button class="btn btn-outline" @click="prev" :disabled="isFirstStep">
+            <!-- Отключение на первом шаге -->
+
+
+
             <i class="fas fa-arrow-left"></i> {{ translations[currentLang].buttons.back }}
+            <!-- Иконка и текст -->
+
           </button>
-          <button 
-            class="btn btn-primary" 
-            @click="nextOrFinish"
-          >
-            {{ isLastStep ? translations[currentLang].buttons.finish : translations[currentLang].buttons.next }} <i class="fas fa-arrow-right"></i>
+          <button class="btn btn-primary" @click="nextOrFinish">
+            <!-- Кнопка "Далее/Завершить" -->
+            {{ isLastStep ? translations[currentLang].buttons.finish : translations[currentLang].buttons.next }}
+            <!-- Условный текст -->
+
+            <i class="fas fa-arrow-right"></i>
+            <!-- Иконка -->
+
           </button>
         </template>
-        
-        <button 
-          v-else
-          class="btn btn-primary" 
-          @click="restart"
-        >
+
+        <button v-else class="btn btn-primary" @click="restart">
+          <!-- Кнопка перезапуска -->
           <i class="fas fa-redo"></i> {{ translations[currentLang].buttons.restart }}
+          <!-- Иконка и текст -->
         </button>
       </div>
     </div>
   </div>
 
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- Подключение Vue.js -->
   <script src="vue.js"></script>
+  <!-- Подключение основного скрипта -->
 </body>
+
 </html>
